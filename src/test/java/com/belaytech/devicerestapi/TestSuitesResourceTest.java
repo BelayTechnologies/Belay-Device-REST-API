@@ -16,6 +16,7 @@
  */
 package com.belaytech.devicerestapi;
 
+import com.belaytech.server.EmbeddedServer;
 import com.belaytech.device.injection.DeviceAPIModule;
 import com.google.inject.Guice;
 import com.sun.jersey.api.client.Client;
@@ -46,10 +47,10 @@ public class TestSuitesResourceTest {
     @Before
     public void startUp() {
         try {
-            server = Main.startServer(Guice.createInjector(new DeviceAPIModule()));
+            server = EmbeddedServer.startServer(Guice.createInjector(new DeviceAPIModule()));
 
             Client client = Client.create(new DefaultClientConfig());
-            service = client.resource(Main.BASE_URI);
+            service = client.resource(EmbeddedServer.BASE_URI);
         } catch (java.io.IOException ex) {
             Assert.fail(ex.getMessage());
         }
@@ -57,7 +58,10 @@ public class TestSuitesResourceTest {
 
     @After
     public void tearDown() throws Exception {
-        server.stop();
+
+        if (server != null && server.isStarted()) {
+            server.stop();
+        }
     }
 
     @Test
